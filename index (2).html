@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alupe University Online Assistant</title>
+
+  <!-- Favicon using AU logo -->
+  <link rel="icon" type="image/jpeg" href="https://au.ac.ke/wp-content/uploads/2025/10/AU_Logo25.jpg" />
+  <link rel="apple-touch-icon" href="https://au.ac.ke/wp-content/uploads/2025/10/AU_Logo25.jpg" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --dark:    #1B4332;
+      --mid:     #2D6A4F;
+      --light:   #52B788;
+      --pale:    #D8F3DC;
+      --gold:    #F59E0B;
+      --white:   #FFFFFF;
+      --offwhite:#F8FAF9;
+      --gray:    #6B7280;
+      --text:    #111827;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--dark);
+    }
+
+    /* ── Background mesh ───────────────────────────────────── */
+    .bg {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 10% 20%, #2D6A4F55 0%, transparent 60%),
+        radial-gradient(ellipse 40% 60% at 90% 80%, #52B78830 0%, transparent 60%),
+        linear-gradient(160deg, #1B4332 0%, #0d2b20 100%);
+      z-index: 0;
+    }
+
+    /* Subtle grain overlay */
+    .bg::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.4;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ── Layout ────────────────────────────────────────────── */
+    .shell {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      grid-template-rows: 100vh;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* ── Sidebar ────────────────────────────────────────────── */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      padding: 36px 28px;
+      border-right: 1px solid rgba(82, 183, 136, 0.15);
+      background: rgba(27, 67, 50, 0.4);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Decorative circle */
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      bottom: -80px;
+      left: -80px;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(82,183,136,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 40px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .logo-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 2px solid rgba(82,183,136,0.4);
+      flex-shrink: 0;
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo-uni {
+      font-family: 'Playfair Display', serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--light);
+      letter-spacing: 0.04em;
+      line-height: 1.2;
+    }
+
+    .logo-sub {
+      font-size: 10px;
+      color: rgba(216,243,220,0.6);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, rgba(82,183,136,0.3), transparent);
+      margin-bottom: 32px;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+
+    .sidebar-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.3;
+      margin-bottom: 12px;
+      animation: fadeUp 0.6s 0.15s ease both;
+    }
+
+    .sidebar-title span {
+      color: var(--gold);
+    }
+
+    .sidebar-desc {
+      font-size: 12.5px;
+      color: rgba(216,243,220,0.7);
+      line-height: 1.7;
+      margin-bottom: 36px;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    .topics-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--light);
+      margin-bottom: 12px;
+      animation: fadeUp 0.6s 0.25s ease both;
+    }
+
+    .topics {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+
+    .topic {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: rgba(82,183,136,0.08);
+      border: 1px solid rgba(82,183,136,0.12);
+      transition: all 0.2s ease;
+      cursor: default;
+    }
+
+    .topic:hover {
+      background: rgba(82,183,136,0.15);
+      border-color: rgba(82,183,136,0.25);
+      transform: translateX(3px);
+    }
+
+    .topic-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--light);
+      flex-shrink: 0;
+    }
+
+    .topic-text {
+      font-size: 12px;
+      color: rgba(216,243,220,0.85);
+      font-weight: 400;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 24px;
+      border-top: 1px solid rgba(82,183,136,0.12);
+      animation: fadeUp 0.6s 0.4s ease both;
+    }
+
+    .contact-line {
+      font-size: 11px;
+      color: rgba(216,243,220,0.5);
+      line-height: 1.8;
+    }
+
+    .contact-line a {
+      color: var(--light);
+      text-decoration: none;
+    }
+
+    .contact-line a:hover {
+      text-decoration: underline;
+    }
+
+    /* ── Chat area ──────────────────────────────────────────── */
+    .chat-area {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background: var(--offwhite);
+      overflow: hidden;
+    }
+
+    /* Top bar */
+    .chat-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 28px;
+      background: var(--white);
+      border-bottom: 1px solid rgba(27,67,50,0.08);
+      flex-shrink: 0;
+      animation: fadeDown 0.5s ease both;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.2);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 3px rgba(34,197,94,0.2); }
+      50%       { box-shadow: 0 0 0 6px rgba(34,197,94,0.08); }
+    }
+
+    .topbar-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: #F59E0B;
+    }
+
+    .topbar-badge {
+      font-size: 10px;
+      color: var(--mid);
+      background: var(--pale);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+    }
+
+    .topbar-right {
+      font-size: 11px;
+      color: var(--gray);
+    }
+
+    /* Chat iframe/embed container */
+    .chat-embed {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Flowise bot container overrides */
+    #chatbot-container {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ── Animations ─────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Mobile responsive ──────────────────────────────────── */
+    @media (max-width: 768px) {
+      .shell {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+      }
+
+      .sidebar {
+        padding: 20px;
+        border-right: none;
+        border-bottom: 1px solid rgba(82,183,136,0.15);
+        flex-direction: row;
+        align-items: center;
+        gap: 16px;
+        overflow: visible;
+      }
+
+      .sidebar::before { display: none; }
+      .divider, .topics-label, .topics, .sidebar-desc, .sidebar-footer { display: none; }
+      .sidebar-title { font-size: 16px; margin-bottom: 0; }
+      .logo-wrap { margin-bottom: 0; }
+
+      .chat-topbar { padding: 12px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg"></div>
+
+  <div class="shell">
+
+    <!-- ── Sidebar ──────────────────────────────────────── -->
+    <aside class="sidebar">
+
+      <div class="logo-wrap">
+        <img
+          class="logo-img"
+          src="https://au.ac.ke/wp-content/uploads/2025/10/AU_Logo25.jpg"
+          alt="Alupe University Logo"
+          onerror="this.style.display='none'"
+        />
+        <div class="logo-text">
+          <span class="logo-uni">Alupe University</span>
+          <span class="logo-sub">Kenya</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <h1 class="sidebar-title">AU Smart<br /><span>Assistant</span></h1>
+      <p class="sidebar-desc">
+        Your official AI-powered guide to everything at Alupe University.
+        Available 24/7 — no waiting, no queues.
+      </p>
+
+      <p class="topics-label">I can help you with</p>
+      <div class="topics">
+        <div class="topic"><div class="topic-dot"></div><span class="topic-text">Programmes & Schools</span></div>
+        <div class="topic"><div class="topic-dot"></div><span class="topic-text">Admission Requirements</span></div>
+        <div class="topic"><div class="topic-dot"></div><span class="topic-text">Fee Structure & Payments</span></div>
+        <div class="topic"><div class="topic-dot"></div><span class="topic-text">Student Accommodation</span></div>
+        <div class="topic"><div class="topic-dot"></div><span class="topic-text">Campus & Facilities</span></div>
+        <div class="topic"><div class="topic-dot"></div><span class="topic-text">Contacts & Offices</span></div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="contact-line">
+          📞 0741214185 / 0736044469<br />
+          📧 <a href="/cdn-cgi/l/email-protection#13767d62667a617a76605372663d72703d7876"><span class="__cf_email__" data-cfemail="13767d62667a617a76605372663d72703d7876">[email&#160;protected]</span></a><br />
+          🕗 Mon–Fri, 8:00 AM – 5:00 PM
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ── Chat Area ─────────────────────────────────────── -->
+    <main class="chat-area">
+
+      <div class="chat-topbar">
+        <div class="topbar-left">
+          <div class="status-dot"></div>
+          <span class="topbar-title">Alupe University Online Assistant</span>
+          <span class="topbar-badge">Online</span>
+        </div>
+        <div class="topbar-right">Powered by Alupe University</div>
+      </div>
+
+      <div class="chat-embed">
+        <div id="chatbot-container"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Flowise embed -->
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
+    import Chatbot from "https://cdn.jsdelivr.net/npm/flowise-embed/dist/web.js"
+    Chatbot.init({
+      chatflowid: "38d94583-4e21-4ea5-bd0a-aae71b112670",
+      apiHost: "https://flowise-production-40d3.up.railway.app",
+      theme: {
+        button: { backgroundColor: "#1B4332" },
+        chatWindow: {
+          showTitle: false,
+          welcomeMessage: "Welcome to Alupe University! 🎓 I am your official AI assistant. How can I help you today?",
+          backgroundColor: "#6D28D9",
+          height: "100%",
+          width: "100%",
+          fontSize: 15,
+          botMessage: {
+            backgroundColor: "#BBF7D0",
+            textColor: "#111827",
+            showAvatar: true,
+            avatarSrc: "https://au.ac.ke/wp-content/uploads/2025/10/AU_Logo25.jpg",
+          },
+          userMessage: {
+            backgroundColor: "#1D4ED8",
+            textColor: "#ffffff",
+            showAvatar: false,
+          },
+          textInput: {
+            placeholder: "Ask me anything about Alupe University...",
+            backgroundColor: "#ffffff",
+            textColor: "#111827",
+            sendButtonColor: "#000000",
+          },
+          footer: { textColor: "#6B7280", text: "Alupe University Official Assistant" }
+        }
+      }
+    })
+
+    // Make chatbot fill its container
+    window.addEventListener('load', () => {
+      const interval = setInterval(() => {
+        const bot = document.querySelector('flowise-chatbot');
+        if (bot) {
+          bot.style.cssText = `
+            position: absolute !important;
+            in
